@@ -11,7 +11,7 @@ const Page = () => {
         <PageContainer>
             <PageArea>
                 <PageTitle>Technical challenge</PageTitle>
-                <Button text="CHALLENGE 1" route="/" />
+                <Button text="CHALLENGE 1" route="/challenge1" />
                 <Button text="CHALLENGE 2" route="/" />
                 <Button text="CHALLENGE 3" route="/" />
                 <Button text="CHALLENGE 4" route="/" />
