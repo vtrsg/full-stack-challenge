@@ -4,6 +4,7 @@ import { PageArea } from './styled';
 
 import HelloMessage from '../../components/HelloMessage';
 import Button from '../../components/partials/Button';
+import PageTitle from '../../components/PageTitle';
 
 const Page = () => {
     const [name, setName] = useState('');
@@ -16,6 +17,7 @@ const Page = () => {
 
     return (
         <PageArea>
+            <PageTitle>Challenge 2 - "Hello, [Name]"</PageTitle>
             {!show ? (
                 <form onSubmit={handleButtonClick}>
                     <label className="area">
