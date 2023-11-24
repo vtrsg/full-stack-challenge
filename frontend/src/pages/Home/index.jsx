@@ -12,7 +12,7 @@ const Page = () => {
             <PageArea>
                 <PageTitle>Technical challenge</PageTitle>
                 <Button text="CHALLENGE 1" route="/challenge1" />
-                <Button text="CHALLENGE 2" route="/" />
+                <Button text="CHALLENGE 2" route="/challenge2" />
                 <Button text="CHALLENGE 3" route="/" />
                 <Button text="CHALLENGE 4" route="/" />
                 <Button text="CHALLENGE 5" route="/" />
