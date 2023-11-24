@@ -43,3 +43,13 @@ class CarSerializer(serializers.Serializer):
             raise ValidationError('Send a valid value for speed.')
 
         return validated_data
+
+
+class TextLinesSerializer(serializers.Serializer):
+    text = serializers.CharField(required=True)
+
+    def validate(self, validated_data):
+        if not isinstance(validated_data['text'], str):
+            raise ValidationError('Send a valid text.')
+
+        return validated_data

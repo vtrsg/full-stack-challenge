@@ -3,7 +3,12 @@ from rest_framework import serializers, status, viewsets
 from rest_framework.response import Response
 
 from .models import Student
-from .serializers import CarSerializer, HelloSerializer, StudentSerializer
+from .serializers import (
+    CarSerializer,
+    HelloSerializer,
+    StudentSerializer,
+    TextLinesSerializer,
+)
 
 
 class StudentViewSet(viewsets.ViewSet):
@@ -114,6 +119,44 @@ class CarViewSet(viewsets.ViewSet):
             speed = serializer.validated_data['speed'] + acceleration
             message = f'Full speed = {speed}km/h'
 
+            return Response(
+                {
+                    'status': 'Success',
+                    'message': message,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except serializers.ValidationError as e:
+            return Response(
+                {
+                    'status': 'Error',
+                    'message': 'Mandatory fields not filled in or invalid values.',
+                    'errors': e.detail,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except IntegrityError as e:
+            return Response(
+                {
+                    'status': 'Error',
+                    'message': str(e),
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class TextLinesViewSet(viewsets.ViewSet):
+    def create(self, request):
+        serializer = TextLinesSerializer(
+            data={'text': request.data.get('text', '')}
+        )
+        try:
+            serializer.is_valid(raise_exception=True)
+            text = serializer.validated_data['text']
+
+            lines = text.split('\n')
+
+            message = {'lines': lines}
             return Response(
                 {
                     'status': 'Success',
