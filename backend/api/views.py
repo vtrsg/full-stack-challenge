@@ -20,7 +20,7 @@ class StudentViewSet(viewsets.ViewSet):
     def calculate_average_grades(self, students):
         total_students = len(students)
         total_grades = sum(
-            student['grade'] for student in students if 'grade' in student
+            int(student.get('grade', 0)) for student in students
         )
 
         return (
@@ -34,14 +34,14 @@ class StudentViewSet(viewsets.ViewSet):
         total_students, average_grades = self.calculate_average_grades(
             serializer.data
         )
-        response_data = serializer.data + [
+
+        return Response(
             {
                 'total_students': total_students,
                 'average_grades': float(format(average_grades, '.2f')),
-            }
-        ]
-
-        return Response(response_data)
+            },
+            status=status.HTTP_200_OK,
+        )
 
     def create(self, request):
         serializer = self.serializer_class(
@@ -50,10 +50,15 @@ class StudentViewSet(viewsets.ViewSet):
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            total_students, average_grades = self.calculate_average_grades(
+                self.get_queryset().values()
+            )
+
             return Response(
                 {
                     'status': 'Success',
-                    'message': 'Created successfully.',
+                    'total_students': total_students,
+                    'average_grades': float(format(average_grades, '.2f')),
                 },
                 status=status.HTTP_201_CREATED,
             )
@@ -147,15 +152,18 @@ class CarViewSet(viewsets.ViewSet):
 
 class TextLinesViewSet(viewsets.ViewSet):
     def create(self, request):
-        serializer = TextLinesSerializer(
-            data={'text': request.data.get('text', '')}
-        )
+        text = request.data.get('text')
+
+        if text is not None:
+            serializer = TextLinesSerializer(data={'text': text})
+        else:
+            serializer = TextLinesSerializer(
+                data={'text': request.FILES['file'].read().decode()}
+            )
+
         try:
             serializer.is_valid(raise_exception=True)
-            text = serializer.validated_data['text']
-
-            lines = text.split('\n')
-
+            lines = serializer.validated_data['text'].split('\n')
             message = {'lines': lines}
             return Response(
                 {
@@ -170,14 +178,6 @@ class TextLinesViewSet(viewsets.ViewSet):
                     'status': 'Error',
                     'message': 'Mandatory fields not filled in or invalid values.',
                     'errors': e.detail,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except IntegrityError as e:
-            return Response(
-                {
-                    'status': 'Error',
-                    'message': str(e),
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )

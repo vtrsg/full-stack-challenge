@@ -25,11 +25,10 @@ class TestStudentViewSet:
 
         viewset = StudentViewSet()
         response = viewset.list(request_func)
-        last_item = response.data[-1]
 
         assert response.status_code == status.HTTP_200_OK
-        assert 'total_students' in last_item
-        assert 'average_grades' in last_item
+        assert 'total_students' in response.data
+        assert 'average_grades' in response.data
 
     def test_create_student_success(self, request_func):
         viewset = StudentViewSet()
