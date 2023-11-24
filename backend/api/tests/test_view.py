@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
 from ..models import Student
-from ..views import StudentViewSet
+from ..views import HelloViewSet, StudentViewSet
 
 
 @pytest.fixture
@@ -58,3 +58,18 @@ class TestStudentViewSet:
         response = viewset.create(request)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+class TestHelloViewSet:
+    def test_retrieve_hello_success(self, rf):
+        viewset = HelloViewSet()
+        pk_name = 'Vittorio'
+        request = rf.get(f'/api/hello/{pk_name}/')
+        response = viewset.retrieve(request, pk_name=pk_name)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert 'status' in response.data
+        assert response.data['status'] == 'Success'
+        assert 'message' in response.data
+        assert response.data['message'] == f'Hello, {pk_name}!'
