@@ -14,4 +14,11 @@ export const PageArea = styled.div`
             height: 250px;
         }
     }
+    .scroll-div {
+        max-width: 500px;
+        height: 300px;
+        overflow: auto;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+    }
 `;

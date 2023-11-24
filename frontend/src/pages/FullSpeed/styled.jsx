@@ -18,7 +18,7 @@ export const PageArea = styled.div`
             padding: 10px;
 
             .area--title {
-                width: 150px;
+                width: 175px;
                 text-align: right;
                 padding-right: 20px;
                 font-weight: bold;
