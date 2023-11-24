@@ -21,3 +21,7 @@ class StudentSerializer(serializers.ModelSerializer):
             return Student.objects.update_or_create(
                 email=validated_data['email'], defaults=validated_data
             )[0]
+
+
+class HelloSerializer(serializers.Serializer):
+    name = serializers.CharField()

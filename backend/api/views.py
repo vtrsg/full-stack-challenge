@@ -3,7 +3,7 @@ from rest_framework import serializers, status, viewsets
 from rest_framework.response import Response
 
 from .models import Student
-from .serializers import StudentSerializer
+from .serializers import HelloSerializer, StudentSerializer
 
 
 class StudentViewSet(viewsets.ViewSet):
@@ -51,6 +51,38 @@ class StudentViewSet(viewsets.ViewSet):
                     'message': 'Created successfully.',
                 },
                 status=status.HTTP_201_CREATED,
+            )
+        except serializers.ValidationError as e:
+            return Response(
+                {
+                    'status': 'Error',
+                    'message': 'Mandatory fields not filled in or invalid values.',
+                    'errors': e.detail,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except IntegrityError as e:
+            return Response(
+                {
+                    'status': 'Error',
+                    'message': str(e),
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class HelloViewSet(viewsets.ViewSet):
+    def retrieve(self, request, pk_name=None):
+        serializer = HelloSerializer(data={'name': pk_name})
+        try:
+            serializer.is_valid(raise_exception=True)
+            message = f'Hello, {serializer.validated_data["name"]}!'
+            return Response(
+                {
+                    'status': 'Success',
+                    'message': message,
+                },
+                status=status.HTTP_200_OK,
             )
         except serializers.ValidationError as e:
             return Response(
