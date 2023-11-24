@@ -2,12 +2,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-fkly8hxi=u1!%dr+824dl5t*^(q1g)cl+=*4$7@zvrrnuw1yh='
+SECRET_KEY = (
+    'django-insecure-fkly8hxi=u1!%dr+824dl5t*^(q1g)cl+=*4$7@zvrrnuw1yh='
+)
 
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 
 INSTALLED_APPS = [
@@ -52,14 +53,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'project.wsgi.application'
 
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -78,7 +77,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -86,7 +84,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 
 STATIC_URL = 'static/'
