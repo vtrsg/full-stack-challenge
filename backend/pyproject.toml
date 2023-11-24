@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["vtrsg <vittorioschmittg@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2.7"
+djangorestframework = "^3.14.0"
+gunicorn = "^21.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+taskipy = "^1.12.2"
+blue = "^0.9.1"
+ruff = "^0.1.6"
+isort = "^5.12.0"
+pytest-django = "^4.7.0"
+
+[tool.taskipy.tasks]
+lint = 'ruff . && blue --check . --diff'
+format = 'blue .  && isort .'
+run = 'python manage.py runserver'
+migrate = 'python manage.py makemigrations && python manage.py migrate'
+test = 'pytest . --cov-report term --cov=. --cov-fail-under=80'
+post_test = 'pytest . --cov-report html --cov=. --cov-fail-under=80'
+
+[tool.ruff]
+line-length = 79
+exclude = ['.venv', 'migrations']
+
+[tool.isort]
+profile = "black"
+line_length = 79
+extend_skip = ['migrations']
+
+[tool.pytest.ini_options]
+pythonpath = "test_* tests.py test_*.py *_tests.py test.py tests.py test_*.py tests_*.py *_test.py *_tests.py"
+
+[tool.blue]
+extend-exclude = '(migrations/)'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
