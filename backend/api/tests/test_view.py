@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
 from ..models import Student
-from ..views import HelloViewSet, StudentViewSet
+from ..views import CarViewSet, HelloViewSet, StudentViewSet
 
 
 @pytest.fixture
@@ -73,3 +73,78 @@ class TestHelloViewSet:
         assert response.data['status'] == 'Success'
         assert 'message' in response.data
         assert response.data['message'] == f'Hello, {pk_name}!'
+
+
+@pytest.mark.django_db
+class TestCarViewSet:
+    def test_retrieve_car_success(self, rf):
+        viewset = CarViewSet()
+        pk_speed = 60
+        pk_acceleration = 20
+        request = rf.get(
+            f'/api/car/speed/{pk_speed}/acceleration/{pk_acceleration}/'
+        )
+        response = viewset.retrieve(
+            request, pk_speed=pk_speed, pk_acceleration=pk_acceleration
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert 'status' in response.data
+        assert response.data['status'] == 'Success'
+        assert 'message' in response.data
+        assert (
+            response.data['message']
+            == f'Full speed = {pk_speed + pk_acceleration}km/h'
+        )
+
+    def test_retrieve_car_invalid_input(self, rf):
+        viewset = CarViewSet()
+        pk_speed = 'NaN'
+        pk_acceleration = -10
+        request = rf.get(
+            f'/api/car/speed/{pk_speed}/acceleration/{pk_acceleration}/'
+        )
+        response = viewset.retrieve(
+            request, pk_speed=pk_speed, pk_acceleration=pk_acceleration
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'status' in response.data
+        assert response.data['status'] == 'Error'
+        assert 'message' in response.data
+        assert 'errors' in response.data
+        assert 'speed' in response.data['errors']
+
+    def test_retrieve_car_negative_acceleration(self, rf):
+        viewset = CarViewSet()
+        pk_speed = 60
+        pk_acceleration = -10
+        request = rf.get(
+            f'/api/car/speed/{pk_speed}/acceleration/{pk_acceleration}/'
+        )
+        response = viewset.retrieve(
+            request, pk_speed=pk_speed, pk_acceleration=pk_acceleration
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'status' in response.data
+        assert response.data['status'] == 'Error'
+        assert 'message' in response.data
+        assert 'errors' in response.data
+
+    def test_retrieve_car_negative_speed(self, rf):
+        viewset = CarViewSet()
+        pk_speed = -60
+        pk_acceleration = 10
+        request = rf.get(
+            f'/api/car/speed/{pk_speed}/acceleration/{pk_acceleration}/'
+        )
+        response = viewset.retrieve(
+            request, pk_speed=pk_speed, pk_acceleration=pk_acceleration
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'status' in response.data
+        assert response.data['status'] == 'Error'
+        assert 'message' in response.data
+        assert 'errors' in response.data
