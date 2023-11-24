@@ -2,18 +2,26 @@ import React, { useState } from 'react';
 
 import { PageArea } from './styled';
 
-import HelloMessage from '../../components/HelloMessage';
 import Button from '../../components/partials/Button';
 import PageTitle from '../../components/PageTitle';
+import { sendFullSpeed } from '../../services/api';
 
 const Page = () => {
     const [speed, setSpeed] = useState(0);
     const [acceleration, setAcceleration] = useState(0);
     const [show, setShow] = useState(false);
+    const [apiResponse, setApiResponse] = useState('');
 
-    const handleButtonClick = (e) => {
+    const handleButtonClick = async (e) => {
         e.preventDefault();
-        setShow(true);
+
+        try {
+            const response = await sendFullSpeed(speed, acceleration);
+            setApiResponse(response.message);
+            setShow(true);
+        } catch (error) {
+            console.error('Request error', error);
+        }
     };
 
     return (
@@ -56,7 +64,9 @@ const Page = () => {
                 </form>
             ) : (
                 <>
-                    <HelloMessage name={speed} />
+                    <h2>
+                        <b>{apiResponse}</b>
+                    </h2>
                     <Button text="Go home" route="/" />
                 </>
             )}

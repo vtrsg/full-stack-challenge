@@ -46,10 +46,10 @@ class CarSerializer(serializers.Serializer):
 
 
 class TextLinesSerializer(serializers.Serializer):
-    text = serializers.CharField(required=True)
+    text = serializers.CharField()
 
     def validate(self, validated_data):
-        if not isinstance(validated_data['text'], str):
-            raise ValidationError('Send a valid text.')
-
+        text = validated_data.get('text')
+        if not text or not isinstance(text, str):
+            raise ValidationError('Send a valid non-empty text.')
         return validated_data

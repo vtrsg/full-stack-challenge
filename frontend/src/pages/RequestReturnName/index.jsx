@@ -2,17 +2,25 @@ import React, { useState } from 'react';
 
 import { PageArea } from './styled';
 
-import HelloMessage from '../../components/HelloMessage';
 import Button from '../../components/partials/Button';
 import PageTitle from '../../components/PageTitle';
+import { sendName } from '../../services/api';
 
 const Page = () => {
     const [name, setName] = useState('');
     const [show, setShow] = useState(false);
+    const [apiResponse, setApiResponse] = useState('');
 
-    const handleButtonClick = (e) => {
+    const handleButtonClick = async (e) => {
         e.preventDefault();
-        setShow(true);
+
+        try {
+            const response = await sendName(name);
+            setApiResponse(response.message);
+            setShow(true);
+        } catch (error) {
+            console.error('Request error', error);
+        }
     };
 
     return (
@@ -40,7 +48,9 @@ const Page = () => {
                 </form>
             ) : (
                 <>
-                    <HelloMessage name={name} />
+                    <h2>
+                        <b>{apiResponse}</b>
+                    </h2>
                     <Button text="Go home" route="/" />
                 </>
             )}
