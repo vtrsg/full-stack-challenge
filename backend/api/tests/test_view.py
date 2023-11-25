@@ -1,9 +1,12 @@
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIClient, APIRequestFactory
 
 from ..models import Student
-from ..views import CarViewSet, HelloViewSet, StudentViewSet
+from ..views import CarViewSet, HelloViewSet, StudentViewSet, TextLinesViewSet
+
+client = APIClient()
 
 
 @pytest.fixture
@@ -93,7 +96,7 @@ class TestCarViewSet:
         assert 'message' in response.data
         assert (
             response.data['message']
-            == f'Full speed = {pk_speed + pk_acceleration}km/h'
+            == f'Speed = {pk_speed + pk_acceleration}km/h'
         )
 
     def test_retrieve_car_invalid_input(self, rf):
@@ -147,3 +150,29 @@ class TestCarViewSet:
         assert response.data['status'] == 'Error'
         assert 'message' in response.data
         assert 'errors' in response.data
+
+
+@pytest.mark.django_db
+class TestTextLinesViewSet:
+    def test_create_with_text(self):
+        data = {'text': 'This is a sample text with more than 15 words.'}
+        response = client.post('/api/text/lines/', data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['status'] == 'Success'
+        assert 'lines' in response.json()['message']
+
+    def test_create_with_file(self):
+        file_content = 'This is a sample text with more than 15 words.'
+        uploaded_file = SimpleUploadedFile('test.txt', file_content.encode())
+        data = {'file': uploaded_file}
+        response = client.post('/api/text/lines/', data, format='multipart')
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['status'] == 'Success'
+        assert 'lines' in response.json()['message']
+
+    def test_break_text_method(self):
+        viewset = TextLinesViewSet()
+        text = 'This is a sample text with more than 15 words.'
+        lines = viewset.break_text(text, words_min=5)
+        assert lines
+        assert len(lines) == 2
