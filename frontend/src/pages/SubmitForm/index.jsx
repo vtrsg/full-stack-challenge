@@ -18,6 +18,9 @@ const Page = () => {
         alert(`Name: ${name}\nEmail: ${email}\nPassword: ${password}`);
 
         setDisabled(true);
+        setName('');
+        setEmail('');
+        setPassword('');
     };
     return (
         <PageContainer>

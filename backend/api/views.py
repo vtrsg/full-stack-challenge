@@ -1,3 +1,5 @@
+import re
+
 from django.db import IntegrityError
 from rest_framework import serializers, status, viewsets
 from rest_framework.response import Response
@@ -113,6 +115,15 @@ class HelloViewSet(viewsets.ViewSet):
             )
 
 
+class Vehicle:
+    def __init__(self, speed=0, acceleration=0):
+        self.speed = speed
+        self.acceleration = acceleration
+
+    def accelerate(self):
+        self.speed += self.acceleration
+
+
 class CarViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk_speed=None, pk_acceleration=None):
         serializer = CarSerializer(
@@ -120,9 +131,13 @@ class CarViewSet(viewsets.ViewSet):
         )
         try:
             serializer.is_valid(raise_exception=True)
-            acceleration = serializer.validated_data['acceleration']
-            speed = serializer.validated_data['speed'] + acceleration
-            message = f'Full speed = {speed}km/h'
+            car = Vehicle(
+                speed=serializer.validated_data['speed'],
+                acceleration=serializer.validated_data['acceleration'],
+            )
+            car.accelerate()
+
+            message = f'Speed = {car.speed}km/h'
 
             return Response(
                 {
@@ -151,6 +166,24 @@ class CarViewSet(viewsets.ViewSet):
 
 
 class TextLinesViewSet(viewsets.ViewSet):
+    def break_text(self, text, words_min=15):
+        text_without_newlines = re.sub(r'\s+', ' ', text)
+
+        words = text_without_newlines.split()
+        lines = []
+        current_line = []
+
+        for word in words:
+            current_line.append(word)
+            if len(current_line) >= words_min:
+                lines.append(' '.join(current_line))
+                current_line = []
+
+        if current_line:
+            lines.append(' '.join(current_line))
+
+        return lines
+
     def create(self, request):
         text = request.data.get('text')
 
@@ -163,7 +196,9 @@ class TextLinesViewSet(viewsets.ViewSet):
 
         try:
             serializer.is_valid(raise_exception=True)
-            lines = serializer.validated_data['text'].split('\n')
+            text = serializer.validated_data['text']
+            lines = self.break_text(text, words_min=15)
+
             message = {'lines': lines}
             return Response(
                 {
